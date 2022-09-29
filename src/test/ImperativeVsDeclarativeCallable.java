@@ -122,9 +122,8 @@ public class ImperativeVsDeclarativeCallable {
 
 	private static Collection<Callable<Integer>> getDeclarativeSimpleCallableGroup() {
 
-		return IntStream.rangeClosed(1, 10).mapToObj((a) -> {
-			return getDeclarativeSimpleCallable();
-		}).collect(Collectors.toList());
+		return IntStream.rangeClosed(1, 10).mapToObj((a) -> getDeclarativeSimpleCallable())
+				.collect(Collectors.toList());
 
 	}
 
