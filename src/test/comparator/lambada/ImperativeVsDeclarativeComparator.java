@@ -22,10 +22,18 @@ public class ImperativeVsDeclarativeComparator {
 		System.out.println("Declarative Style");
 		getResultCompareMethod("Declartive");
 
-		List<Student> students = createStudentList();
-		students.sort(StudentComparatorHelper.getImperativeStyleComparatorFirstName(Direction.DESC));
-		students.forEach(System.out::println);
+		getSortedListOfSudentsByFirstName(Direction.ASC).stream().reduce(new test(""), (a, b)->{
+			return a;
+		},null);
+		getSortedListOfSudentsByFirstName(Direction.DESC).forEach(System.out::println);
+	}
 
+	private static List<Student> getSortedListOfSudentsByFirstName(Direction d) {
+		var students = createStudentList();
+		var comparator = StudentComparatorHelper.getImperativeStyleComparatorFirstName(d);
+		students.sort(comparator);
+	
+		return students;
 	}
 
 	private static void getResultCompareMethod(String styleName) {
@@ -80,4 +88,10 @@ public class ImperativeVsDeclarativeComparator {
 		return students;
 	}
 
+}
+
+record test(String name) {};
+
+interface IComparatorStudentProp {
+	Comparator<Student> compareWithDirection(Direction dir);
 }
