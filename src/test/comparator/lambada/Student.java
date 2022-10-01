@@ -2,7 +2,7 @@ package test.comparator.lambada;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 
-@JsonRootName(value ="Student")
+@JsonRootName(value = "Student")
 public class Student {
 	private Integer id;
 	private String firstName;
@@ -13,10 +13,9 @@ public class Student {
 	private String ipAddress;
 
 	public Student() {
-		super();
 	}
 
-	/*public Student(String firstName, String lastName, int age, String email, String gender, String ipAddress) {
+	public Student(String firstName, String lastName, int age, String email, String gender, String ipAddress) {
 
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -24,9 +23,8 @@ public class Student {
 		this.email = email;
 		this.gender = gender;
 		this.ipAddress = ipAddress;
-	}*/
+	}
 
-	
 	public String getFirstName() {
 		return firstName;
 	}
