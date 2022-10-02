@@ -24,26 +24,28 @@ public class ImperativeVsDeclarativeComparator {
 		System.out.println("Declarative Style");
 		getResultCompareMethod("Declartive");
 
-		var t = getSortedListOfSudentsByFirstName(Direction.ASC).stream().parallel()
-				.reduce(new MappingResult(new HashMap<>()), (a, b) -> {
+		var t = getSortedListOfSudentsByFirstName(Direction.ASC).stream().reduce(new MappingResult(new HashMap<>()),
+				(a, b) -> {
 					String firstName = b.getFirstName();
 					if (firstName != null && !firstName.equals("") && firstName.length() >= 1) {
 
 						firstName = firstName.substring(0, 1).toLowerCase();
 
-						if (!a.lexiSubList().keySet().contains(firstName)) {
-							var list = a.lexiSubList().get(firstName);
-							if (list == null) {
-								list = new ArrayList<>();
+						if (!a.analyser().keySet().contains(firstName)) {
+							var mapping = a.analyser().get(firstName);
+							if (mapping == null) {
+								var list = new ArrayList<Student>();
 								list.add(b);
-								a.lexiSubList().put(firstName, list);
-
+								mapping = new MappingAnalyser(1, list);
+								a.analyser().put(firstName, mapping);
 							}
 						} else {
-							var list = a.lexiSubList().get(firstName);
-							list.add(b);
-							a.lexiSubList().put(firstName, list);
-
+							var mapping = a.analyser().get(firstName);
+							mapping.lexiSubList().add(b);
+							var count = mapping.count();
+							count++;
+							var newMapping = new MappingAnalyser(count, mapping.lexiSubList());
+							a.analyser().put(firstName, newMapping);
 						}
 					}
 					return a;
@@ -52,9 +54,9 @@ public class ImperativeVsDeclarativeComparator {
 				});
 		// getSortedListOfSudentsByFirstName(Direction.DESC).forEach(System.out::println);
 
-		t.lexiSubList().forEach((k, v) -> {
-			System.out.println("KEY===>" + k);
-			v.forEach(System.out::println);
+		t.analyser().forEach((k, v) -> {
+			System.out.println("KEY===>" + k + " Count ==>" + v.count());
+			v.lexiSubList().forEach(System.out::println);
 		});
 
 	}
@@ -112,7 +114,6 @@ public class ImperativeVsDeclarativeComparator {
 		try {
 			InputStream targetStream = new FileInputStream(initialFile);
 			students = mapper.readValue(targetStream, collectionType);
-			// students.forEach(System.out::println);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -121,8 +122,11 @@ public class ImperativeVsDeclarativeComparator {
 
 }
 
-record MappingResult(Map<String, List<Student>> lexiSubList) {
+record MappingResult(Map<String, MappingAnalyser> analyser) {
 };
+
+record MappingAnalyser(Integer count, List<Student> lexiSubList) {
+}
 
 interface IComparatorStudentProp {
 	Comparator<Student> compareWithDirection(Direction dir);
