@@ -24,40 +24,39 @@ public class ImperativeVsDeclarativeComparator {
 		System.out.println("Declarative Style");
 		getResultCompareMethod("Declartive");
 
-		@SuppressWarnings("unlikely-arg-type")
-		var t = getSortedListOfSudentsByFirstName(Direction.ASC).stream().parallel().reduce(new test("", new HashMap<>()),
-				(a, b) -> {
+		var t = getSortedListOfSudentsByFirstName(Direction.ASC).stream().parallel()
+				.reduce(new MappingResult(new HashMap<>()), (a, b) -> {
 					String firstName = b.getFirstName();
-					if(firstName != null && !firstName.equals("") && firstName.length() >=1) {
-						
-						//System.out.println(firstName);
+					if (firstName != null && !firstName.equals("") && firstName.length() >= 1) {
+
 						firstName = firstName.substring(0, 1).toLowerCase();
-						if (!a.lexiSubList().containsValue(firstName)) {
+
+						if (!a.lexiSubList().keySet().contains(firstName)) {
 							var list = a.lexiSubList().get(firstName);
 							if (list == null) {
 								list = new ArrayList<>();
 								list.add(b);
 								a.lexiSubList().put(firstName, list);
-								
-							}else {
-								list.add(b);
-								a.lexiSubList().put(firstName,list );
+
 							}
-							
+						} else {
+							var list = a.lexiSubList().get(firstName);
+							list.add(b);
+							a.lexiSubList().put(firstName, list);
+
 						}
 					}
 					return a;
-				}, (test a, test b)->{
-					System.out.println(a.name() +a.lexiSubList().size() );
+				}, (MappingResult a, MappingResult b) -> {
 					return a;
 				});
-		//getSortedListOfSudentsByFirstName(Direction.DESC).forEach(System.out::println);
-		t.name();
-		t.lexiSubList().forEach((k, v)->{
-			System.out.println("KEY===>"+k);
-				v.forEach(System.out::println);
+		// getSortedListOfSudentsByFirstName(Direction.DESC).forEach(System.out::println);
+
+		t.lexiSubList().forEach((k, v) -> {
+			System.out.println("KEY===>" + k);
+			v.forEach(System.out::println);
 		});
-		
+
 	}
 
 	private static List<Student> getSortedListOfSudentsByFirstName(Direction d) {
@@ -122,7 +121,7 @@ public class ImperativeVsDeclarativeComparator {
 
 }
 
-record test(String name, Map<String, List<Student>> lexiSubList) {
+record MappingResult(Map<String, List<Student>> lexiSubList) {
 };
 
 interface IComparatorStudentProp {
