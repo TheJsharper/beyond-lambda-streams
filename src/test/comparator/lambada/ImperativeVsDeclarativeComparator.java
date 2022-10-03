@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,39 +24,13 @@ public class ImperativeVsDeclarativeComparator {
 		System.out.println("Declarative Style");
 		getResultCompareMethod("Declartive");
 
-		var t = getSortedListOfSudentsByFirstName(Direction.ASC).stream().reduce(new MappingResult(new HashMap<>()),
-				(a, b) -> {
-					String firstName = b.getFirstName();
-					if (firstName != null && !firstName.equals("") && firstName.length() >= 1) {
-
-						firstName = firstName.substring(0, 1).toLowerCase();
-
-						if (!a.analyser().keySet().contains(firstName)) {
-							var mapping = a.analyser().get(firstName);
-							if (mapping == null) {
-								var list = new ArrayList<Student>();
-								list.add(b);
-								mapping = new MappingAnalyser(1, list);
-								a.analyser().put(firstName, mapping);
-							}
-						} else {
-							var mapping = a.analyser().get(firstName);
-							mapping.lexiSubList().add(b);
-							var count = mapping.count();
-							count++;
-							var newMapping = new MappingAnalyser(count, mapping.lexiSubList());
-							a.analyser().put(firstName, newMapping);
-						}
-					}
-					return a;
-				}, (MappingResult a, MappingResult b) -> {
-					return a;
-				});
-		// getSortedListOfSudentsByFirstName(Direction.DESC).forEach(System.out::println);
-
+		var t = StudentComparatorHelper.getAnalyserSortingByFirstName(getSortedListOfSudentsByFirstName(Direction.ASC),
+				Direction.ASC);
 		t.analyser().forEach((k, v) -> {
-			System.out.println("KEY===>" + k + " Count ==>" + v.count());
-			v.lexiSubList().forEach(System.out::println);
+
+			System.out.println("KEY===>" + k + " Count ==>" + v.count() + " Previous: " + v.previous() + " Current: "
+					+ v.current());
+			v.labels().forEach(System.out::println);
 		});
 
 	}
@@ -125,7 +99,8 @@ public class ImperativeVsDeclarativeComparator {
 record MappingResult(Map<String, MappingAnalyser> analyser) {
 };
 
-record MappingAnalyser(Integer count, List<Student> lexiSubList) {
+record MappingAnalyser(Integer count, ArrayList<Student> lexiSubList, String previous, String current,
+		boolean isProofWorkValid,LinkedList<Boolean> proofOfWorkValidations, LinkedList<String> labels) {
 }
 
 interface IComparatorStudentProp {
