@@ -81,6 +81,48 @@ public class StudentComparatorHelper {
 
 		return result;
 	}
+	public static MappingResult getAnalyserSortingByLastName(List<Student> students, DIRECTION dir) {
+		
+		var result = students.stream().reduce(
+				new MappingResult(new TreeMap<>(StudentComparatorHelper.getTreeMapComparator(dir))),
+				(MappingResult mappingResult, Student student) -> {
+					String lastName = student.getLastName();
+					if (lastName != null && !lastName.equals("") && lastName.length() >= 1) {
+						
+						lastName = lastName.substring(0, 1).toLowerCase();
+						
+						if (!mappingResult.analyser().keySet().contains(lastName)) {
+							var mapping = mappingResult.analyser().get(lastName);
+							if (mapping == null) {
+								var list = new ArrayList<Student>();
+								list.add(student);
+								mapping = new MappingAnalyser(1, list, "", student.getLastName(), false,
+										new LinkedList<Boolean>(), new LinkedList<String>());
+								mappingResult.analyser().put(lastName, mapping);
+							}
+						} else {
+							var mapping = mappingResult.analyser().get(lastName);
+							mapping.lexiSubList().add(student);
+							var count = mapping.count();
+							count++;
+							boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC)
+									? mapping.current().compareTo(student.getLastName()) <= 0
+									: mapping.current().compareTo(student.getLastName()) >= 0;
+									String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: "
+											+ mapping.current() + " Previuos: " + student.getLastName();
+									mapping.proofOfWorkValidations().add(isProofOfWorkValid);
+									mapping.labels().add(label);
+									var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(),
+											student.getLastName(), isProofOfWorkValid, mapping.proofOfWorkValidations(),
+											mapping.labels());
+									mappingResult.analyser().put(lastName, newMapping);
+						}
+					}
+					return mappingResult;
+				}, (MappingResult a, MappingResult b) -> b);
+		
+		return result;
+	}
 
 	public static Comparator<String> getTreeMapComparator(DIRECTION dir) {
 

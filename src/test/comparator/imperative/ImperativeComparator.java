@@ -29,6 +29,7 @@ public class ImperativeComparator {
 		getResultCompareMethod("Declartive");
 
 		printAnalyserSortingByFirstName(DIRECTION.ASC);
+		printAnalyserSortingByLastName(DIRECTION.DESC);
 
 	}
 
@@ -48,9 +49,33 @@ public class ImperativeComparator {
 
 	}
 
+	private static void printAnalyserSortingByLastName(DIRECTION dir) {
+		var studentsSortedByLastName = StudentComparatorHelper
+				.getAnalyserSortingByLastName(getSortedListOfSudentsByLastName(dir), dir);
+
+		for (Map.Entry<String, MappingAnalyser> entry : studentsSortedByLastName.analyser().entrySet()) {
+			System.out.println("KEY===>" + entry.getKey() + " Count ==>" + entry.getValue().count() + " Previous: "
+					+ entry.getValue().previous() + " Current: " + entry.getValue().current());
+
+			for (String label : entry.getValue().labels()) {
+				System.out.println(label);
+			}
+
+		}
+
+	}
+
 	private static List<Student> getSortedListOfSudentsByFirstName(DIRECTION d) {
 		var students = createStudentList();
 		var comparator = StudentComparatorHelper.getImperativeStyleComparatorFirstName(d);
+		students.sort(comparator);
+
+		return students;
+	}
+
+	private static List<Student> getSortedListOfSudentsByLastName(DIRECTION d) {
+		var students = createStudentList();
+		var comparator = StudentComparatorHelper.getImperativeStyleComparatorLastName(d);
 		students.sort(comparator);
 
 		return students;
