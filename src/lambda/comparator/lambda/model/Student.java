@@ -3,7 +3,7 @@ package lambda.comparator.lambda.model;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName(value = "Student")
-public class Student {
+public class Student implements Comparable<Student> {
 	private Integer id;
 	private String firstName;
 	private String lastName;
@@ -85,6 +85,12 @@ public class Student {
 	public String toString() {
 		return "Student [firstName=" + firstName + ", lastName=" + lastName + ", age=" + age + ", email=" + email
 				+ ", gender=" + gender + ", ipAddress=" + ipAddress + "]";
+	}
+
+	@Override
+	public int compareTo(Student o) {
+		
+		return this.firstName.compareTo(o.firstName);
 	}
 
 }
