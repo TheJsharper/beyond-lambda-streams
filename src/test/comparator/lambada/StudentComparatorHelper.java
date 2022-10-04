@@ -2,9 +2,9 @@ package test.comparator.lambada;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
 
 public class StudentComparatorHelper {
 
@@ -38,7 +38,8 @@ public class StudentComparatorHelper {
 	@SuppressWarnings("exports")
 	public static MappingResult getAnalyserSortingByFirstName(List<Student> students, Direction dir) {
 
-		var result = students.stream().reduce(new MappingResult(new HashMap<>()),
+		var result = students.stream().reduce(
+				new MappingResult(new TreeMap<>(StudentComparatorHelper.getTreeMapComparator(dir))),
 				(MappingResult mappingResult, Student student) -> {
 					String firstName = student.getFirstName();
 					if (firstName != null && !firstName.equals("") && firstName.length() >= 1) {
@@ -64,7 +65,6 @@ public class StudentComparatorHelper {
 									: mapping.current().compareTo(student.getFirstName()) >= 0;
 							String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: "
 									+ mapping.current() + " Previuos: " + student.getFirstName();
-							//System.out.println(label);
 							mapping.proofOfWorkValidations().add(isProofOfWorkValid);
 							mapping.labels().add(label);
 							var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(),
@@ -74,9 +74,23 @@ public class StudentComparatorHelper {
 						}
 					}
 					return mappingResult;
-				}, (MappingResult a, MappingResult b) -> a);
+				}, (MappingResult a, MappingResult b) -> b);
 
 		return result;
+	}
+
+	@SuppressWarnings("exports")
+	public static Comparator<String> getTreeMapComparator(Direction dir) {
+
+		return new Comparator<String>() {
+
+			@Override
+			public int compare(String o1, String o2) {
+
+				return dir.equals(Direction.ASC) ? o1.compareTo(o2) : o2.compareTo(o1);
+			}
+
+		};
 	}
 
 }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -24,8 +24,8 @@ public class ImperativeVsDeclarativeComparator {
 		System.out.println("Declarative Style");
 		getResultCompareMethod("Declartive");
 
-		var t = StudentComparatorHelper.getAnalyserSortingByFirstName(getSortedListOfSudentsByFirstName(Direction.ASC),
-				Direction.ASC);
+		var t = StudentComparatorHelper.getAnalyserSortingByFirstName(getSortedListOfSudentsByFirstName(Direction.DESC),
+				Direction.DESC);
 		t.analyser().forEach((k, v) -> {
 
 			System.out.println("KEY===>" + k + " Count ==>" + v.count() + " Previous: " + v.previous() + " Current: "
@@ -96,11 +96,11 @@ public class ImperativeVsDeclarativeComparator {
 
 }
 
-record MappingResult(Map<String, MappingAnalyser> analyser) {
+record MappingResult(TreeMap<String, MappingAnalyser> analyser) {
 };
 
 record MappingAnalyser(Integer count, ArrayList<Student> lexiSubList, String previous, String current,
-		boolean isProofWorkValid,LinkedList<Boolean> proofOfWorkValidations, LinkedList<String> labels) {
+		boolean isProofWorkValid, LinkedList<Boolean> proofOfWorkValidations, LinkedList<String> labels) {
 }
 
 interface IComparatorStudentProp {
