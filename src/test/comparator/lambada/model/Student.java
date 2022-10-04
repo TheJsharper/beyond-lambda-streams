@@ -1,4 +1,4 @@
-package test.comparator.lambada;
+package test.comparator.lambada.model;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
 

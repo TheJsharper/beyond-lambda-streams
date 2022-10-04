@@ -1,4 +1,4 @@
-package test.comparator.lambada;
+package test.comparator.imperative;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -6,16 +6,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
-public class ImperativeVsDeclarativeComparator {
+import test.comparator.lambada.StudentComparatorHelper;
+import test.comparator.lambada.model.DIRECTION;
+import test.comparator.lambada.model.MappingAnalyser;
+import test.comparator.lambada.model.Student;
+
+public class ImperativeComparator {
 	public static void main(String[] args) {
 		System.out.println("Imperative Style");
 
@@ -24,18 +28,27 @@ public class ImperativeVsDeclarativeComparator {
 		System.out.println("Declarative Style");
 		getResultCompareMethod("Declartive");
 
-		var t = StudentComparatorHelper.getAnalyserSortingByFirstName(getSortedListOfSudentsByFirstName(Direction.DESC),
-				Direction.DESC);
-		t.analyser().forEach((k, v) -> {
-
-			System.out.println("KEY===>" + k + " Count ==>" + v.count() + " Previous: " + v.previous() + " Current: "
-					+ v.current());
-			v.labels().forEach(System.out::println);
-		});
+		printAnalyserSortingByFirstName(DIRECTION.ASC);
 
 	}
 
-	private static List<Student> getSortedListOfSudentsByFirstName(Direction d) {
+	private static void printAnalyserSortingByFirstName(DIRECTION dir) {
+		var studentsSortedByFirstName = StudentComparatorHelper
+				.getAnalyserSortingByFirstName(getSortedListOfSudentsByFirstName(dir), dir);
+
+		for (Map.Entry<String, MappingAnalyser> entry : studentsSortedByFirstName.analyser().entrySet()) {
+			System.out.println("KEY===>" + entry.getKey() + " Count ==>" + entry.getValue().count() + " Previous: "
+					+ entry.getValue().previous() + " Current: " + entry.getValue().current());
+
+			for (String label : entry.getValue().labels()) {
+				System.out.println(label);
+			}
+
+		}
+
+	}
+
+	private static List<Student> getSortedListOfSudentsByFirstName(DIRECTION d) {
 		var students = createStudentList();
 		var comparator = StudentComparatorHelper.getImperativeStyleComparatorFirstName(d);
 		students.sort(comparator);
@@ -94,15 +107,4 @@ public class ImperativeVsDeclarativeComparator {
 		return students;
 	}
 
-}
-
-record MappingResult(TreeMap<String, MappingAnalyser> analyser) {
-};
-
-record MappingAnalyser(Integer count, ArrayList<Student> lexiSubList, String previous, String current,
-		boolean isProofWorkValid, LinkedList<Boolean> proofOfWorkValidations, LinkedList<String> labels) {
-}
-
-interface IComparatorStudentProp {
-	Comparator<Student> compareWithDirection(Direction dir);
 }

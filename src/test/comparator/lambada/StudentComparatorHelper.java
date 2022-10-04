@@ -6,15 +6,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
+import test.comparator.lambada.model.DIRECTION;
+import test.comparator.lambada.model.MappingAnalyser;
+import test.comparator.lambada.model.MappingResult;
+import test.comparator.lambada.model.Student;
+
 public class StudentComparatorHelper {
 
-	public static Comparator<Student> getImperativeStyleComparatorFirstName(
-			@SuppressWarnings("exports") Direction dir) {
+	public static Comparator<Student> getImperativeStyleComparatorFirstName(DIRECTION dir) {
 		return new Comparator<Student>() {
 
 			@Override
 			public int compare(Student o1, Student o2) {
-				if (dir == Direction.ASC)
+				if (dir.equals(DIRECTION.ASC))
 					return o1.getFirstName().compareTo(o2.getFirstName());
 				else
 					return o2.getFirstName().compareTo(o1.getFirstName());
@@ -22,12 +26,12 @@ public class StudentComparatorHelper {
 		};
 	}
 
-	public static Comparator<Student> getImperativeStyleComparatorLastName(@SuppressWarnings("exports") Direction dir) {
+	public static Comparator<Student> getImperativeStyleComparatorLastName(DIRECTION dir) {
 		return new Comparator<Student>() {
 
 			@Override
 			public int compare(Student o1, Student o2) {
-				if (dir.equals(Direction.ASC))
+				if (dir.equals(DIRECTION.ASC))
 					return o1.getLastName().compareTo(o2.getLastName());
 				else
 					return o2.getLastName().compareTo(o1.getLastName());
@@ -35,8 +39,7 @@ public class StudentComparatorHelper {
 		};
 	}
 
-	@SuppressWarnings("exports")
-	public static MappingResult getAnalyserSortingByFirstName(List<Student> students, Direction dir) {
+	public static MappingResult getAnalyserSortingByFirstName(List<Student> students, DIRECTION dir) {
 
 		var result = students.stream().reduce(
 				new MappingResult(new TreeMap<>(StudentComparatorHelper.getTreeMapComparator(dir))),
@@ -60,7 +63,7 @@ public class StudentComparatorHelper {
 							mapping.lexiSubList().add(student);
 							var count = mapping.count();
 							count++;
-							boolean isProofOfWorkValid = dir.equals(Direction.ASC)
+							boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC)
 									? mapping.current().compareTo(student.getFirstName()) <= 0
 									: mapping.current().compareTo(student.getFirstName()) >= 0;
 							String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: "
@@ -79,22 +82,17 @@ public class StudentComparatorHelper {
 		return result;
 	}
 
-	@SuppressWarnings("exports")
-	public static Comparator<String> getTreeMapComparator(Direction dir) {
+	public static Comparator<String> getTreeMapComparator(DIRECTION dir) {
 
 		return new Comparator<String>() {
 
 			@Override
 			public int compare(String o1, String o2) {
 
-				return dir.equals(Direction.ASC) ? o1.compareTo(o2) : o2.compareTo(o1);
+				return dir.equals(DIRECTION.ASC) ? o1.compareTo(o2) : o2.compareTo(o1);
 			}
 
 		};
 	}
 
-}
-
-enum Direction {
-	ASC, DESC
 }
