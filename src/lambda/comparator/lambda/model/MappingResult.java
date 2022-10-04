@@ -1,4 +1,4 @@
-package test.comparator.lambada.model;
+package lambda.comparator.lambda.model;
 
 import java.util.TreeMap;
 

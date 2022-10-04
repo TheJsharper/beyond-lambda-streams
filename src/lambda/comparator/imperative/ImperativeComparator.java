@@ -1,23 +1,14 @@
-package test.comparator.imperative;
+package lambda.comparator.imperative;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
-
-import test.comparator.lambada.StudentComparatorHelper;
-import test.comparator.lambada.model.DIRECTION;
-import test.comparator.lambada.model.MappingAnalyser;
-import test.comparator.lambada.model.Student;
+import lambda.comparator.StudentComparatorHelper;
+import lambda.comparator.lambda.model.DIRECTION;
+import lambda.comparator.lambda.model.MappingAnalyser;
+import lambda.comparator.lambda.model.Student;
+import lambda.comparator.utils.Utils;
 
 public class ImperativeComparator {
 	public static void main(String[] args) {
@@ -66,7 +57,7 @@ public class ImperativeComparator {
 	}
 
 	private static List<Student> getSortedListOfSudentsByFirstName(DIRECTION d) {
-		var students = createStudentList();
+		var students = Utils.createStudentList();
 		var comparator = StudentComparatorHelper.getImperativeStyleComparatorFirstName(d);
 		students.sort(comparator);
 
@@ -74,7 +65,7 @@ public class ImperativeComparator {
 	}
 
 	private static List<Student> getSortedListOfSudentsByLastName(DIRECTION d) {
-		var students = createStudentList();
+		var students = Utils.createStudentList();
 		var comparator = StudentComparatorHelper.getImperativeStyleComparatorLastName(d);
 		students.sort(comparator);
 
@@ -112,24 +103,6 @@ public class ImperativeComparator {
 	private static Comparator<Integer> getComparatorDeclarativeStyle() {
 
 		return (Integer o1, Integer o2) -> o1.compareTo(o2);
-	}
-
-	private static List<Student> createStudentList() {
-		ObjectMapper mapper = new ObjectMapper().setVisibility(PropertyAccessor.FIELD, Visibility.NONE)
-				.setVisibility(PropertyAccessor.GETTER, Visibility.PUBLIC_ONLY)
-				.setVisibility(PropertyAccessor.SETTER, Visibility.PUBLIC_ONLY)
-				.setVisibility(PropertyAccessor.CREATOR, Visibility.PUBLIC_ONLY);
-		CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(List.class, Student.class);
-
-		File initialFile = new File("resources/persons.json");
-		List<Student> students = new ArrayList<>();
-		try {
-			InputStream targetStream = new FileInputStream(initialFile);
-			students = mapper.readValue(targetStream, collectionType);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return students;
 	}
 
 }

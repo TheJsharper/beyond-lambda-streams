@@ -1,4 +1,4 @@
-package test.comparator.lambada;
+package lambda.comparator;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -6,10 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
-import test.comparator.lambada.model.DIRECTION;
-import test.comparator.lambada.model.MappingAnalyser;
-import test.comparator.lambada.model.MappingResult;
-import test.comparator.lambada.model.Student;
+import lambda.comparator.lambda.model.DIRECTION;
+import lambda.comparator.lambda.model.MappingAnalyser;
+import lambda.comparator.lambda.model.MappingResult;
+import lambda.comparator.lambda.model.Student;
 
 public class StudentComparatorHelper {
 
