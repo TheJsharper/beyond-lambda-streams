@@ -8,7 +8,7 @@ public class DeclarativeComparator {
 
 	public static void main(String[] args) {
 
-		var c = StudentGenericComparator.getGenericComparatorLambda(Student.class, "age", true); // new
+		var c = StudentGenericComparator.getGenericComparatorLambda(Student.class, "age", false); // new
 																										// NaturalComparator<Student>();//StudentGenericComparator.getImperativeStyleComparatorFirstName(DIRECTION.DESC,
 		// "getFirstName");
 		var student = Utils.createStudentList();
