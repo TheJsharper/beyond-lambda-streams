@@ -3,11 +3,17 @@ package lambda.comparator;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import lambda.comparator.lambda.model.DIRECTION;
+import lambda.comparator.lambda.model.MappingAnalyser;
+import lambda.comparator.lambda.model.MappingResult;
 import lambda.comparator.lambda.model.Student;
 
 public class StudentGenericComparator {
@@ -98,13 +104,127 @@ public class StudentGenericComparator {
 		return field;
 	}
 
-	/*
-	 * public static <T> Comparator<T> orderByComparatorFnc(){ Comparator<T>
-	 * orderByComparator = (f1, f2) -> { Comparable compA, compB; try { compA =
-	 * (Comparable) field.get(f1); compB = (Comparable) field.get(f2); } catch
-	 * (IllegalAccessException e) { throw new RuntimeException(e); } return
-	 * Object.compare(compA, compB, Comparator.naturalOrder()); }; return
-	 * orderByComparator; }
-	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Comparator<T> orderByComparatorFnc(Class<?> clazz, String fieldName, DIRECTION dir) {
+		Comparator<T> orderByComparator = (f1, f2) -> {
+			Comparable<T> compA, compB;
+			final Field field = getField(clazz, fieldName);
+			field.setAccessible(true);
+			try {
+				compA = (Comparable<T>) field.get(f1);
+				compB = (Comparable<T>) field.get(f2);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			}
+
+			// handling null comparators
+			if (compA == null)
+				return -1;
+			else if (compB == null)
+				return 1;
+
+			return DIRECTION.ASC.equals(dir) ? compA.compareTo((T) compB) : compB.compareTo((T) compA);
+		};
+		return orderByComparator;
+	}
+
+	@SuppressWarnings("unused")
+	public static <T> Result reducer(MappingResult mappingResultp, Student students, DIRECTION dir, Class<?> clazz,
+			String sortingBy) {
+		final Field field = getField(clazz, sortingBy);
+		Class<?> type = field.getType();
+		Result r = (MappingResult mappingResult, Student student) -> {
+
+			Comparator<T> comp = orderByComparatorFnc(clazz, sortingBy, DIRECTION.ASC);
+			// Comparator<T> comp = orderByComparatorFnc(student,sortingBy, dir);
+
+			String lastName = student.getLastName();
+			if (lastName != null && !lastName.equals("") && lastName.length() >= 1) {
+
+				lastName = lastName.substring(0, 1).toLowerCase();
+
+				if (!mappingResult.analyser().keySet().contains(lastName)) {
+					var mapping = mappingResult.analyser().get(lastName);
+					if (mapping == null) {
+						var list = new ArrayList<Student>();
+						list.add(student);
+						mapping = new MappingAnalyser(1, list, "", student.getLastName(), false,
+								new LinkedList<Boolean>(), new LinkedList<String>());
+						mappingResult.analyser().put(lastName, mapping);
+					}
+				} else {
+					var mapping = mappingResult.analyser().get(lastName);
+					mapping.lexiSubList().add(student);
+					var count = mapping.count();
+					count++;
+					boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC)
+							? mapping.current().compareTo(student.getLastName()) <= 0
+							: mapping.current().compareTo(student.getLastName()) >= 0;
+					String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: "
+							+ mapping.current() + " Previuos: " + student.getLastName();
+					mapping.proofOfWorkValidations().add(isProofOfWorkValid);
+					mapping.labels().add(label);
+					var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(),
+							student.getLastName(), isProofOfWorkValid, mapping.proofOfWorkValidations(),
+							mapping.labels());
+					mappingResult.analyser().put(lastName, newMapping);
+				}
+			}
+			return mappingResult;
+		};
+		return r;
+	}
+
+	public static MappingResult getAnalyserSortingBy(List<Student> students, DIRECTION dir, String sortingBy) {
+
+		var result = students.stream().reduce(
+				new MappingResult(new TreeMap<>(StudentComparatorHelper.getTreeMapComparator(dir))),
+				(MappingResult mappingResult, Student student) -> {
+
+					// Comparator<T> comp = orderByComparatorFnc(student,sortingBy, dir);
+
+					String lastName = student.getLastName();
+					if (lastName != null && !lastName.equals("") && lastName.length() >= 1) {
+
+						lastName = lastName.substring(0, 1).toLowerCase();
+
+						if (!mappingResult.analyser().keySet().contains(lastName)) {
+							var mapping = mappingResult.analyser().get(lastName);
+							if (mapping == null) {
+								var list = new ArrayList<Student>();
+								list.add(student);
+								mapping = new MappingAnalyser(1, list, "", student.getLastName(), false,
+										new LinkedList<Boolean>(), new LinkedList<String>());
+								mappingResult.analyser().put(lastName, mapping);
+							}
+						} else {
+							var mapping = mappingResult.analyser().get(lastName);
+							mapping.lexiSubList().add(student);
+							var count = mapping.count();
+							count++;
+							boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC)
+									? mapping.current().compareTo(student.getLastName()) <= 0
+									: mapping.current().compareTo(student.getLastName()) >= 0;
+							String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: "
+									+ mapping.current() + " Previuos: " + student.getLastName();
+							mapping.proofOfWorkValidations().add(isProofOfWorkValid);
+							mapping.labels().add(label);
+							var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(),
+									student.getLastName(), isProofOfWorkValid, mapping.proofOfWorkValidations(),
+									mapping.labels());
+							mappingResult.analyser().put(lastName, newMapping);
+						}
+					}
+					return mappingResult;
+				}, (MappingResult a, MappingResult b) -> b);
+
+		return result;
+	}
+
+}
+@FunctionalInterface
+interface Result{
+	
+	MappingResult res(MappingResult mappingResult, Student student);
 
 }
