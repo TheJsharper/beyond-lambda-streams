@@ -57,6 +57,35 @@ public class StudentGenericComparator {
 		return Arrays.stream(o1.getMethods()).filter(m -> m.getName().equals(name)).collect(Collectors.toList()).get(0);
 	}
 
+	public static Method findMethodByName(Class<?> o1, String name, Class<?>... parameterTypes) {
+		Method m = null;
+		try {
+			m = o1.getMethod(name, parameterTypes);
+		} catch (NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		}
+		return m;
+	}
+
+	public static Object invokeMethd(Method method, Object[] parameters, Object payload) {
+		Object result = null;
+		try {
+			result = method.invoke(payload, parameters);
+
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+
+			e.printStackTrace();
+		}
+		return result;
+	}
+
+	/*
+	 * public static <T> CastType<T> getCastType(T payload) { if (payload instanceof
+	 * String) { return (CastType<T>) payload; }
+	 * 
+	 * return null; }
+	 */
+
 	@SuppressWarnings("unchecked")
 	public static <T> Comparator<T> getGenericComparatorLambda(Class<?> clazz, String fieldName, boolean orderByAsc) {
 
@@ -135,8 +164,8 @@ public class StudentGenericComparator {
 		Class<?> type = field.getType();
 		Result r = (MappingResult mappingResult, Student student) -> {
 
-			Comparator<T> comp = orderByComparatorFnc(clazz, sortingBy, DIRECTION.ASC);
-			// Comparator<T> comp = orderByComparatorFnc(student,sortingBy, dir);
+			Comparator<T> compA = orderByComparatorFnc(clazz, sortingBy, dir);
+			Comparator<T> compB = orderByComparatorFnc(clazz, sortingBy, dir);
 
 			String lastName = student.getLastName();
 			if (lastName != null && !lastName.equals("") && lastName.length() >= 1) {
@@ -160,8 +189,8 @@ public class StudentGenericComparator {
 					boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC)
 							? mapping.current().compareTo(student.getLastName()) <= 0
 							: mapping.current().compareTo(student.getLastName()) >= 0;
-					String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: "
-							+ mapping.current() + " Previuos: " + student.getLastName();
+					String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: " + mapping.current()
+							+ " Previuos: " + student.getLastName();
 					mapping.proofOfWorkValidations().add(isProofOfWorkValid);
 					mapping.labels().add(label);
 					var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(),
@@ -222,9 +251,21 @@ public class StudentGenericComparator {
 	}
 
 }
+
 @FunctionalInterface
-interface Result{
-	
+interface Result {
+
 	MappingResult res(MappingResult mappingResult, Student student);
 
 }
+/*
+ * protected interface Type<T>{
+ * 
+ * } public interface ICastType<T> extends Type<T>{
+ * 
+ * } public class CastType<T> implements ICastType<T> { private T value;
+ * 
+ * public CastType(T value) { this.value = value; }
+ * 
+ * public String getValue() { return (String)this.value; } }
+ */
