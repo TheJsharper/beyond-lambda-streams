@@ -24,8 +24,9 @@ public class DeclarativeComparator {
 		new ArrayList<String>();
 		Object[] parameters = new Object[] { 1, str.length() };
 		Method m = StudentGenericComparator.findMethodByName(String.class, "substring", parameterTypes);
+		String typeName = str.getClass().getTypeName();
 		Object result = (String) StudentGenericComparator.invokeMethd(m, parameters, str);
-		System.out.println("REsult: ==> " + result);
+		System.out.println("REsult: ==> " + result + " TYpe " + typeName);
 		// var value =StudentGenericComparator.getCastType(str);
 		// String t =value.getValue();
 	}
