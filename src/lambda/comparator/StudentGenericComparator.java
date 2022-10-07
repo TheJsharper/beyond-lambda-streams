@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import lambda.comparator.lambda.model.DIRECTION;
 import lambda.comparator.lambda.model.MappingAnalyser;
-import lambda.comparator.lambda.model.MappingResult;
+import lambda.comparator.lambda.model.MappingResultGeneric;
 import lambda.comparator.lambda.model.Student;
 
 public class StudentGenericComparator {
@@ -60,8 +60,9 @@ public class StudentGenericComparator {
 	public static Method findMethodByName(Class<?> o1, String name, Class<?>... parameterTypes) {
 		Method m = null;
 		try {
-			m = o1.getMethod(name, parameterTypes);
-		} catch (NoSuchMethodException | SecurityException e) {
+			m = o1.getDeclaredMethod(name, parameterTypes);
+			m.setAccessible(true);
+		} catch (SecurityException | NoSuchMethodException e) {
 			e.printStackTrace();
 		}
 		return m;
@@ -78,13 +79,6 @@ public class StudentGenericComparator {
 		}
 		return result;
 	}
-
-	/*
-	 * public static <T> CastType<T> getCastType(T payload) { if (payload instanceof
-	 * String) { return (CastType<T>) payload; }
-	 * 
-	 * return null; }
-	 */
 
 	@SuppressWarnings("unchecked")
 	public static <T> Comparator<T> getGenericComparatorLambda(Class<?> clazz, String fieldName, boolean orderByAsc) {
@@ -158,114 +152,100 @@ public class StudentGenericComparator {
 	}
 
 	@SuppressWarnings("unused")
-	public static <T> Result reducer(MappingResult mappingResultp, Student students, DIRECTION dir, Class<?> clazz,
-			String sortingBy) {
-		final Field field = getField(clazz, sortingBy);
-		Class<?> type = field.getType();
-		Result r = (MappingResult mappingResult, Student student) -> {
+	public static <T> Result reducer(MappingResultGeneric mappingResultp, Student students, DIRECTION dir,
+			Class<?> clazz, String sortingBy) {
+
+		Result r = (MappingResultGeneric mappingResult, Student student) -> {
 
 			Comparator<T> compA = orderByComparatorFnc(clazz, sortingBy, dir);
 			Comparator<T> compB = orderByComparatorFnc(clazz, sortingBy, dir);
 
-			String lastName = student.getLastName();
-			if (lastName != null && !lastName.equals("") && lastName.length() >= 1) {
+			Object prop = isStringSortedProp(clazz, student, sortingBy);
 
-				lastName = lastName.substring(0, 1).toLowerCase();
+			if (prop instanceof String) {
+				String propString = (String) prop;
 
-				if (!mappingResult.analyser().keySet().contains(lastName)) {
-					var mapping = mappingResult.analyser().get(lastName);
-					if (mapping == null) {
-						var list = new ArrayList<Student>();
-						list.add(student);
-						mapping = new MappingAnalyser(1, list, "", student.getLastName(), false,
-								new LinkedList<Boolean>(), new LinkedList<String>());
-						mappingResult.analyser().put(lastName, mapping);
+				if (propString != null && !propString.equals("") && propString.length() >= 1) {
+					String key = propString.substring(0, 1).toLowerCase();
+					if (!mappingResult.analyser().keySet().contains(key)) {
+						var mapping = mappingResult.analyser().get(key);
+						if (mapping == null) {
+							var list = new ArrayList<Student>();
+							list.add(student);
+							mapping = new MappingAnalyser(1, list, "", propString, false, new LinkedList<Boolean>(),
+									new LinkedList<String>());
+							mappingResult.analyser().put(key, mapping);
+						}
+					} else {
+						var mapping = mappingResult.analyser().get(key);
+						mapping.lexiSubList().add(student);
+						var count = mapping.count();
+						count++;
+						boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC)
+								? mapping.current().compareTo(propString) <= 0
+								: mapping.current().compareTo(propString) >= 0;
+						String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: " + mapping.current()
+								+ " Previuos: " + propString;
+						mapping.proofOfWorkValidations().add(isProofOfWorkValid);
+						mapping.labels().add(label);
+						var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(),
+								propString, isProofOfWorkValid, mapping.proofOfWorkValidations(), mapping.labels());
+						mappingResult.analyser().put(key, newMapping);
 					}
-				} else {
-					var mapping = mappingResult.analyser().get(lastName);
-					mapping.lexiSubList().add(student);
-					var count = mapping.count();
-					count++;
-					boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC)
-							? mapping.current().compareTo(student.getLastName()) <= 0
-							: mapping.current().compareTo(student.getLastName()) >= 0;
-					String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: " + mapping.current()
-							+ " Previuos: " + student.getLastName();
-					mapping.proofOfWorkValidations().add(isProofOfWorkValid);
-					mapping.labels().add(label);
-					var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(),
-							student.getLastName(), isProofOfWorkValid, mapping.proofOfWorkValidations(),
-							mapping.labels());
-					mappingResult.analyser().put(lastName, newMapping);
+
 				}
 			}
+
 			return mappingResult;
 		};
 		return r;
 	}
 
-	public static MappingResult getAnalyserSortingBy(List<Student> students, DIRECTION dir, String sortingBy) {
+	public static Object isStringSortedProp(Class<?> clazz, Object student, String sortingBy) {
+		Class<?>[] parameterTypes = new Class<?>[] {};
+		Method sortMethod = StudentGenericComparator.findMethodByName(clazz, sortingBy, parameterTypes);
+		Object[] parameters = new Object[] {};
+
+		Object result = StudentGenericComparator.invokeMethd(sortMethod, parameters, student);
+		return result;
+
+	}
+
+	public static MappingResultGeneric getAnalyserSortingBy(List<Student> students, DIRECTION dir, Class<?> clazz,
+			String sortingBy) {
 
 		var result = students.stream().reduce(
-				new MappingResult(new TreeMap<>(StudentComparatorHelper.getTreeMapComparator(dir))),
-				(MappingResult mappingResult, Student student) -> {
+				new MappingResultGeneric(new TreeMap<>(StudentComparatorHelper.getTreeMapComparator(dir))),
+				(MappingResultGeneric mappingResult, Student student) -> {
 
-					// Comparator<T> comp = orderByComparatorFnc(student,sortingBy, dir);
-
-					String lastName = student.getLastName();
-					if (lastName != null && !lastName.equals("") && lastName.length() >= 1) {
-
-						lastName = lastName.substring(0, 1).toLowerCase();
-
-						if (!mappingResult.analyser().keySet().contains(lastName)) {
-							var mapping = mappingResult.analyser().get(lastName);
-							if (mapping == null) {
-								var list = new ArrayList<Student>();
-								list.add(student);
-								mapping = new MappingAnalyser(1, list, "", student.getLastName(), false,
-										new LinkedList<Boolean>(), new LinkedList<String>());
-								mappingResult.analyser().put(lastName, mapping);
-							}
-						} else {
-							var mapping = mappingResult.analyser().get(lastName);
-							mapping.lexiSubList().add(student);
-							var count = mapping.count();
-							count++;
-							boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC)
-									? mapping.current().compareTo(student.getLastName()) <= 0
-									: mapping.current().compareTo(student.getLastName()) >= 0;
-							String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: "
-									+ mapping.current() + " Previuos: " + student.getLastName();
-							mapping.proofOfWorkValidations().add(isProofOfWorkValid);
-							mapping.labels().add(label);
-							var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(),
-									student.getLastName(), isProofOfWorkValid, mapping.proofOfWorkValidations(),
-									mapping.labels());
-							mappingResult.analyser().put(lastName, newMapping);
-						}
-					}
-					return mappingResult;
-				}, (MappingResult a, MappingResult b) -> b);
+					var r = StudentGenericComparator.reducer(mappingResult, student, dir, clazz, sortingBy);
+					return r.res(mappingResult, student);
+				}, (MappingResultGeneric a, MappingResultGeneric b) -> b);
 
 		return result;
 	}
 
+	public static void justTest() {
+		Student instance = justSimpleStundent();
+		StudentGenericComparator.isStringSortedProp(instance.getClass(), instance, "getFirstName");
+	}
+
+	public static Student justSimpleStundent() {
+		return new Student("John", "due", 30, "john.due@company.com", "Male", "http://127.0.0.1");
+	}
+
+	public static void printAllNameMethodOf(Class<?> clazz) {
+		Arrays.stream(clazz.getMethods()).forEach((m) -> System.out.println(m.getName()));
+	}
+
+	public static void printAllFieldNameMethodOf(Class<?> clazz) {
+		Arrays.stream(clazz.getFields()).forEach((f) -> System.out.println(f.getName()));
+	}
 }
 
 @FunctionalInterface
 interface Result {
 
-	MappingResult res(MappingResult mappingResult, Student student);
+	MappingResultGeneric res(MappingResultGeneric mappingResult, Student student);
 
 }
-/*
- * protected interface Type<T>{
- * 
- * } public interface ICastType<T> extends Type<T>{
- * 
- * } public class CastType<T> implements ICastType<T> { private T value;
- * 
- * public CastType(T value) { this.value = value; }
- * 
- * public String getValue() { return (String)this.value; } }
- */
