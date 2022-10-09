@@ -6,13 +6,18 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 import lambda.comparator.lambda.model.DIRECTION;
-import lambda.comparator.lambda.model.MappingAnalyser;
+import lambda.comparator.lambda.model.MappingAnalyserGeneric;
 import lambda.comparator.lambda.model.MappingResultGeneric;
 import lambda.comparator.lambda.model.Student;
 
@@ -81,7 +86,8 @@ public class StudentGenericComparator {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <T> Comparator<T> getGenericComparatorLambda(Class<?> clazz, String fieldName, boolean orderByAsc) {
+	public static <T> Comparator<T> getGenericComparatorLambda(Class<?> clazz, String fieldName,
+			DIRECTION dir/* , boolean orderByAsc */) {
 
 		// get field from class
 		final Field field = getField(clazz, fieldName);
@@ -111,7 +117,7 @@ public class StudentGenericComparator {
 		};
 
 		// reverse comparator if order is descending
-		if (orderByComparator != null && !orderByAsc)
+		if (orderByComparator != null && dir.equals(DIRECTION.DESC))
 			orderByComparator = orderByComparator.reversed();
 
 		return orderByComparator;
@@ -151,18 +157,20 @@ public class StudentGenericComparator {
 		return orderByComparator;
 	}
 
-	public static <T> Result reducer(MappingResultGeneric mappingResultp, Student students, DIRECTION dir,
+	@SuppressWarnings("unchecked")
+	public static <T> Result<T> reducer(MappingResultGeneric<T> mappingResultP, Student students, DIRECTION dir,
 			Class<?> clazz, String sortingBy) {
 
-		Result result = (MappingResultGeneric mappingResult, Student student) -> {
+		Result<T> result = (MappingResultGeneric<T> mappingResult, Student student) -> {
 
 			Object prop = isStringSortedProp(clazz, student, sortingBy);
 
 			if (prop instanceof String) {
-				resultStringProps(dir, mappingResult, student, prop);
+				resultStringProps(dir, (MappingResultGeneric<String>) mappingResult, student, prop);
 			}
 			if (prop instanceof Integer) {
 
+				resultIntegerProps(dir, (MappingResultGeneric<Integer>) mappingResult, students, prop);
 			}
 
 			return mappingResult;
@@ -170,23 +178,23 @@ public class StudentGenericComparator {
 		return result;
 	}
 
-	private static void resultStringProps(DIRECTION dir, MappingResultGeneric mappingResult, Student student,
+	private static void resultStringProps(DIRECTION dir, MappingResultGeneric<String> mappingResult, Student student,
 			Object prop) {
 		String propString = (String) prop;
 
 		if (propString != null && !propString.equals("") && propString.length() >= 1) {
 			String key = propString.substring(0, 1).toLowerCase();
 			if (!mappingResult.analyser().keySet().contains(key)) {
-				var mapping = mappingResult.analyser().get(key);
+				MappingAnalyserGeneric<String> mapping = mappingResult.analyser().get(key);
 				if (mapping == null) {
 					var list = new ArrayList<Student>();
 					list.add(student);
-					mapping = new MappingAnalyser(1, list, "", propString, false, new LinkedList<Boolean>(),
-							new LinkedList<String>());
+					mapping = new MappingAnalyserGeneric<String>(1, list, "", propString, false,
+							new LinkedList<Boolean>(), new LinkedList<String>());
 					mappingResult.analyser().put(key, mapping);
 				}
 			} else {
-				var mapping = mappingResult.analyser().get(key);
+				MappingAnalyserGeneric<String> mapping = mappingResult.analyser().get(key);
 				mapping.lexiSubList().add(student);
 				var count = mapping.count();
 				count++;
@@ -196,8 +204,43 @@ public class StudentGenericComparator {
 						+ " Previuos: " + propString;
 				mapping.proofOfWorkValidations().add(isProofOfWorkValid);
 				mapping.labels().add(label);
-				var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(), propString,
-						isProofOfWorkValid, mapping.proofOfWorkValidations(), mapping.labels());
+				var newMapping = new MappingAnalyserGeneric<String>(count, mapping.lexiSubList(), mapping.current(),
+						propString, isProofOfWorkValid, mapping.proofOfWorkValidations(), mapping.labels());
+				mappingResult.analyser().put(key, newMapping);
+			}
+
+		}
+	}
+
+	private static void resultIntegerProps(DIRECTION dir, MappingResultGeneric<Integer> mappingResult, Student student,
+			Object prop) {
+		Integer propInteger = (Integer) prop;
+
+		if (propInteger != null) {
+			String key = propInteger.toString().toLowerCase();
+			if (!mappingResult.analyser().keySet().contains(key)) {
+				MappingAnalyserGeneric<Integer> mapping = mappingResult.analyser().get(key);
+				if (mapping == null) {
+					var list = new ArrayList<Student>();
+					list.add(student);
+					var labels = new LinkedList<String>();
+					mapping = new MappingAnalyserGeneric<Integer>(1, list, Integer.valueOf(Integer.MIN_VALUE),
+							propInteger, false, new LinkedList<Boolean>(), labels);
+					mappingResult.analyser().put(key, mapping);
+				}
+			} else {
+				var mapping = mappingResult.analyser().get(key);
+				mapping.lexiSubList().add(student);
+				var count = mapping.count();
+				count++;
+				boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC) ? mapping.current().compareTo(propInteger) <= 0
+						: mapping.current().compareTo(propInteger) >= 0;
+				String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: " + mapping.current()
+						+ " Previuos: " + propInteger;
+				mapping.proofOfWorkValidations().add(isProofOfWorkValid);
+				mapping.labels().add(label);
+				var newMapping = new MappingAnalyserGeneric<Integer>(count, mapping.lexiSubList(), mapping.current(),
+						propInteger, isProofOfWorkValid, mapping.proofOfWorkValidations(), mapping.labels());
 				mappingResult.analyser().put(key, newMapping);
 			}
 
@@ -214,16 +257,16 @@ public class StudentGenericComparator {
 
 	}
 
-	public static MappingResultGeneric getAnalyserSortingBy(List<Student> students, DIRECTION dir, Class<?> clazz,
-			String sortingBy) {
+	public static <T> MappingResultGeneric<T> getAnalyserSortingBy(List<Student> students, DIRECTION dir,
+			Class<?> clazz, String sortingBy) {
 
 		var result = students.stream().reduce(
-				new MappingResultGeneric(new TreeMap<>(StudentComparatorHelper.getTreeMapComparator(dir))),
-				(MappingResultGeneric mappingResult, Student student) -> {
+				new MappingResultGeneric<T>(new TreeMap<>(StudentComparatorHelper.getTreeMapComparator(dir))),
+				(MappingResultGeneric<T> mappingResult, Student student) -> {
 
 					var reducerFn = StudentGenericComparator.reducer(mappingResult, student, dir, clazz, sortingBy);
 					return reducerFn.doResult(mappingResult, student);
-				}, (MappingResultGeneric a, MappingResultGeneric b) -> b);
+				}, (MappingResultGeneric<T> a, MappingResultGeneric<T> b) -> b);
 
 		return result;
 	}
@@ -241,14 +284,58 @@ public class StudentGenericComparator {
 		Arrays.stream(clazz.getMethods()).forEach((m) -> System.out.println(m.getName()));
 	}
 
+	public static List<String> getAllDeclaredGetterMethodOf(Class<?> clazz) {
+		return Arrays.stream(clazz.getDeclaredMethods()).filter((Method m) -> m.getName().startsWith("get"))
+				.map((Method m) -> m.getName()).collect(Collectors.toList());
+	}
+
 	public static void printAllFieldNameMethodOf(Class<?> clazz) {
 		Arrays.stream(clazz.getFields()).forEach((f) -> System.out.println(f.getName()));
+	}
+
+	public static List<String> getAllDeclaredFieldOf(Class<?> clazz) {
+
+		return Arrays.stream(clazz.getDeclaredFields()).map((Field field) -> field.getName())
+				.collect(Collectors.toList());
+	}
+
+	private static BiFunction<HashMap<String, String>, String, HashMap<String, String>> getAccumulator(
+			String methodName) {
+
+		BiFunction<HashMap<String, String>, String, HashMap<String, String>> accumulator = (
+				HashMap<String, String> result, String field) -> {
+			if (!result.keySet().contains(field) && methodName.length() >= 3
+					&& field.toUpperCase().equals(methodName.substring(3, methodName.length()).toUpperCase())) {
+				result.put(field, methodName);
+			}
+
+			return result;
+		};
+		return accumulator;
+	}
+
+	public static Map<String, String> getAllDeclaredMethodFieldOf(Class<?> clazz) {
+
+		var methods = getAllDeclaredGetterMethodOf(clazz).stream();
+		var fields = getAllDeclaredFieldOf(clazz);
+
+		BinaryOperator<HashMap<String, String>> combiner = (HashMap<String, String> a, HashMap<String, String> b) -> a;
+
+		var rs = methods.flatMap((String methodName) -> fields.stream()
+				.reduce(new HashMap<String, String>(), (HashMap<String, String> result, String field) -> {
+					var acc = getAccumulator(methodName);
+					return acc.apply(result, field);
+				}, combiner).entrySet().stream())
+				.collect(Collectors.toMap(Entry::getKey, Entry::getValue, (a, b) -> b));
+
+		return rs;
+
 	}
 }
 
 @FunctionalInterface
-interface Result {
+interface Result<T> {
 
-	MappingResultGeneric doResult(MappingResultGeneric mappingResult, Student student);
+	MappingResultGeneric<T> doResult(MappingResultGeneric<T> mappingResult, Student student);
 
 }
