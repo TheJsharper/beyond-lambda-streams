@@ -151,54 +151,57 @@ public class StudentGenericComparator {
 		return orderByComparator;
 	}
 
-	@SuppressWarnings("unused")
 	public static <T> Result reducer(MappingResultGeneric mappingResultp, Student students, DIRECTION dir,
 			Class<?> clazz, String sortingBy) {
 
-		Result r = (MappingResultGeneric mappingResult, Student student) -> {
-
-			Comparator<T> compA = orderByComparatorFnc(clazz, sortingBy, dir);
-			Comparator<T> compB = orderByComparatorFnc(clazz, sortingBy, dir);
+		Result result = (MappingResultGeneric mappingResult, Student student) -> {
 
 			Object prop = isStringSortedProp(clazz, student, sortingBy);
 
 			if (prop instanceof String) {
-				String propString = (String) prop;
+				resultStringProps(dir, mappingResult, student, prop);
+			}
+			if (prop instanceof Integer) {
 
-				if (propString != null && !propString.equals("") && propString.length() >= 1) {
-					String key = propString.substring(0, 1).toLowerCase();
-					if (!mappingResult.analyser().keySet().contains(key)) {
-						var mapping = mappingResult.analyser().get(key);
-						if (mapping == null) {
-							var list = new ArrayList<Student>();
-							list.add(student);
-							mapping = new MappingAnalyser(1, list, "", propString, false, new LinkedList<Boolean>(),
-									new LinkedList<String>());
-							mappingResult.analyser().put(key, mapping);
-						}
-					} else {
-						var mapping = mappingResult.analyser().get(key);
-						mapping.lexiSubList().add(student);
-						var count = mapping.count();
-						count++;
-						boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC)
-								? mapping.current().compareTo(propString) <= 0
-								: mapping.current().compareTo(propString) >= 0;
-						String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: " + mapping.current()
-								+ " Previuos: " + propString;
-						mapping.proofOfWorkValidations().add(isProofOfWorkValid);
-						mapping.labels().add(label);
-						var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(),
-								propString, isProofOfWorkValid, mapping.proofOfWorkValidations(), mapping.labels());
-						mappingResult.analyser().put(key, newMapping);
-					}
-
-				}
 			}
 
 			return mappingResult;
 		};
-		return r;
+		return result;
+	}
+
+	private static void resultStringProps(DIRECTION dir, MappingResultGeneric mappingResult, Student student,
+			Object prop) {
+		String propString = (String) prop;
+
+		if (propString != null && !propString.equals("") && propString.length() >= 1) {
+			String key = propString.substring(0, 1).toLowerCase();
+			if (!mappingResult.analyser().keySet().contains(key)) {
+				var mapping = mappingResult.analyser().get(key);
+				if (mapping == null) {
+					var list = new ArrayList<Student>();
+					list.add(student);
+					mapping = new MappingAnalyser(1, list, "", propString, false, new LinkedList<Boolean>(),
+							new LinkedList<String>());
+					mappingResult.analyser().put(key, mapping);
+				}
+			} else {
+				var mapping = mappingResult.analyser().get(key);
+				mapping.lexiSubList().add(student);
+				var count = mapping.count();
+				count++;
+				boolean isProofOfWorkValid = dir.equals(DIRECTION.ASC) ? mapping.current().compareTo(propString) <= 0
+						: mapping.current().compareTo(propString) >= 0;
+				String label = "===> Proof of Work: " + isProofOfWorkValid + " Current: " + mapping.current()
+						+ " Previuos: " + propString;
+				mapping.proofOfWorkValidations().add(isProofOfWorkValid);
+				mapping.labels().add(label);
+				var newMapping = new MappingAnalyser(count, mapping.lexiSubList(), mapping.current(), propString,
+						isProofOfWorkValid, mapping.proofOfWorkValidations(), mapping.labels());
+				mappingResult.analyser().put(key, newMapping);
+			}
+
+		}
 	}
 
 	public static Object isStringSortedProp(Class<?> clazz, Object student, String sortingBy) {
@@ -218,8 +221,8 @@ public class StudentGenericComparator {
 				new MappingResultGeneric(new TreeMap<>(StudentComparatorHelper.getTreeMapComparator(dir))),
 				(MappingResultGeneric mappingResult, Student student) -> {
 
-					var r = StudentGenericComparator.reducer(mappingResult, student, dir, clazz, sortingBy);
-					return r.res(mappingResult, student);
+					var reducerFn = StudentGenericComparator.reducer(mappingResult, student, dir, clazz, sortingBy);
+					return reducerFn.doResult(mappingResult, student);
 				}, (MappingResultGeneric a, MappingResultGeneric b) -> b);
 
 		return result;
@@ -246,6 +249,6 @@ public class StudentGenericComparator {
 @FunctionalInterface
 interface Result {
 
-	MappingResultGeneric res(MappingResultGeneric mappingResult, Student student);
+	MappingResultGeneric doResult(MappingResultGeneric mappingResult, Student student);
 
 }
