@@ -249,7 +249,7 @@ public class StudentGenericComparator {
 
 	public static Object isStringSortedProp(Class<?> clazz, Object student, String sortingBy) {
 		Class<?>[] parameterTypes = new Class<?>[] {};
-		Method sortMethod = StudentGenericComparator.findMethodByName(clazz, sortingBy, parameterTypes);
+		Method sortMethod = findMethodByName(clazz, sortingBy, parameterTypes);
 		Object[] parameters = new Object[] {};
 
 		Object result = StudentGenericComparator.invokeMethd(sortMethod, parameters, student);
@@ -273,7 +273,7 @@ public class StudentGenericComparator {
 
 	public static void justTest() {
 		Student instance = justSimpleStundent();
-		StudentGenericComparator.isStringSortedProp(instance.getClass(), instance, "getFirstName");
+		isStringSortedProp(instance.getClass(), instance, "getFirstName");
 	}
 
 	public static Student justSimpleStundent() {
