@@ -1,5 +1,8 @@
 package lambda.comparator.lambda.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName(value = "Student")
@@ -11,6 +14,8 @@ public class Student implements Comparable<Student> {
 	private String email;
 	private String gender;
 	private String ipAddress;
+
+	private List<Address> addresses = new ArrayList<>();
 
 	public Student() {
 	}
@@ -89,8 +94,16 @@ public class Student implements Comparable<Student> {
 
 	@Override
 	public int compareTo(Student o) {
-		
+
 		return this.firstName.compareTo(o.firstName);
+	}
+
+	public List<Address> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<Address> addresses) {
+		this.addresses = addresses;
 	}
 
 }
