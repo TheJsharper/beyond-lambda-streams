@@ -28,8 +28,8 @@ public class StudentGenericComparator {
 
 			@Override
 			public int compare(Student o1, Student o2) {
-				var studentClass1 = StudentGenericComparator.findMethod(o1.getClass(), propertyName);
-				var studentClass2 = StudentGenericComparator.findMethod(o2.getClass(), propertyName);
+				var studentClass1 = findMethod(o1.getClass(), propertyName);
+				var studentClass2 = findMethod(o2.getClass(), propertyName);
 
 				Object propValueOne = null;
 				Object propValueTwo = null;
@@ -38,7 +38,7 @@ public class StudentGenericComparator {
 					propValueOne = studentClass1.invoke(o1.getClass(), new Object[] { null });
 					propValueTwo = studentClass2.invoke(o1.getClass(), new Object[] { null });
 
-					var compareTo = StudentGenericComparator.findMethod(propValueOne.getClass(), "CompareTo");
+					var compareTo = findMethod(propValueOne.getClass(), "CompareTo");
 					if (dir.equals(DIRECTION.ASC)) {
 
 						var ret = compareTo.invoke(propValueOne.getClass(), propValueTwo.getClass());
@@ -252,7 +252,7 @@ public class StudentGenericComparator {
 		Method sortMethod = findMethodByName(clazz, sortingBy, parameterTypes);
 		Object[] parameters = new Object[] {};
 
-		Object result = StudentGenericComparator.invokeMethd(sortMethod, parameters, student);
+		Object result = invokeMethd(sortMethod, parameters, student);
 		return result;
 
 	}
@@ -264,7 +264,7 @@ public class StudentGenericComparator {
 				new MappingResultGeneric<T>(new TreeMap<>(StudentComparatorHelper.getTreeMapComparator(dir))),
 				(MappingResultGeneric<T> mappingResult, Student student) -> {
 
-					var reducerFn = StudentGenericComparator.reducer(mappingResult, student, dir, clazz, sortingBy);
+					var reducerFn = reducer(mappingResult, student, dir, clazz, sortingBy);
 					return reducerFn.doResult(mappingResult, student);
 				}, (MappingResultGeneric<T> a, MappingResultGeneric<T> b) -> b);
 
