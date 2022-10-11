@@ -61,9 +61,7 @@ public class Utils {
 	public static List<Student> createStudentListWithAddresses() {
 		var students = createStudentList();
 		var addresses = createAddressList();
-		Supplier<Stream<List<Address>>> supplier = () -> {
-			return Stream.of(addresses);
-		};
+		Supplier<Stream<List<Address>>> supplier = () -> Stream.of(addresses);
 
 		Map<String, List<Address>> addressMap = supplier.get().findFirst().get().stream()
 				.collect(Collectors.groupingBy(Address::getCountry));
