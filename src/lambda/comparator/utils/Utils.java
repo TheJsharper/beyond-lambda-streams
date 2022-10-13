@@ -75,5 +75,48 @@ public class Utils {
 		}).collect(Collectors.toList());
 
 	}
+	@SuppressWarnings("serial")
+	public static List<Student> getSimpleStudents() {
+
+		var students = new ArrayList<Student>() {
+
+			{
+				add(new Student("Max", "Bauer", 20, "max.bauer@domain.com", "male", null));
+				add(new Student("Min", "Schmitz", 24, "min.schmitz@domain.com", "male", null));
+				add(new Student("Linda", "Berger", 22, "linda.berger@domain.com", "female", null));
+				add(new Student("Rosa", "Maier", 15, "rosa.maier@maydomain.com", "female", null));
+			}
+		};
+		return students;
+	}
+
+	@SuppressWarnings("serial")
+	public static List<Address> getSimpleAddresses() {
+		return new ArrayList<Address>() {
+			{
+				add(new Address(1, "Mainstreet,56", "New York", "7852NY8588", "USA"));
+				add(new Address(2, "Mainstreet,85", "Los Angeles", "3692LA989", "USA"));
+				add(new Address(3, "Mainstreet,78", "Chicago", "7852CH8588", "USA"));
+				add(new Address(4, "Mainstreet,102", "Miami", "7852FL8588", "USA"));
+			}
+		};
+	}
+
+	public static List<Student> getMergedSimpleStudentAdresses() {
+
+		var students = getSimpleStudents();
+		var addresses = getSimpleAddresses();
+
+		Random next = new Random();
+		var result = students.stream().collect(Collectors.mapping((Student s) -> {
+			int index = next.nextInt(0, addresses.size());
+			var subList = addresses.subList(0, index);
+			s.setAddresses(subList);
+			return s;
+		}, Collectors.toList()));
+
+		return result;
+	}
+
 
 }
