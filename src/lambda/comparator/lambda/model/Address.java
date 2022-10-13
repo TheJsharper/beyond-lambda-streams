@@ -7,6 +7,18 @@ public class Address {
 	private String city;
 	private String zip;
 
+	public Address(int id, String street, String city, String zip, String country) {
+		super();
+		this.id = id;
+		this.street = street;
+		this.city = city;
+		this.zip = zip;
+		this.country = country;
+	}
+
+	public Address() {
+	}
+
 	private String country;
 
 	public int getId() {
