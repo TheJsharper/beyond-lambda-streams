@@ -22,10 +22,10 @@ public class UsingBasisFnc {
 		Function<String, String> rely = Function.identity();
 		System.out.println("===>" + rely.apply("hey, can you read me?"));
 		System.out.println("----------------- Using BiFunction -----------------------");
-		System.out.println(" sum(5, 3): " + adder.apply(5, 3));
-		System.out.println(" substract(5, 3): " + substract.apply(5, 3));
-		System.out.println(" multiplier(5, 3): " + multiplier.apply(5, 3));
-		System.out.println(" divider(5.0, 3.5): " + divider.apply(5.0, 3.5));
+		System.out.println(" sum(5, 3)" + adder.apply(5, 3));
+		System.out.println(" substract(5, 3)" + substract.apply(5, 3));
+		System.out.println(" multiplier(5, 3)" + multiplier.apply(5, 3));
+		System.out.println(" divider(5.0, 3.5)" + divider.apply(5.0, 3.5));
 	}
 
 }
