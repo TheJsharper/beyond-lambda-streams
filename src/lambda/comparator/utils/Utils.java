@@ -95,7 +95,7 @@ public class Utils {
 		return new ArrayList<Address>() {
 			{
 				add(new Address(1, "Mainstreet,56", "New York", "7852NY8588", "USA"));
-				add(new Address(2, "Mainstreet,85", "Los Angeles", "3692LA989", "USA"));
+				add(new Address(2, "Mainstreet,85", "Los Angeles", "3692LA989", "MX"));
 				add(new Address(3, "Mainstreet,78", "Chicago", "7852CH8588", "USA"));
 				add(new Address(4, "Mainstreet,102", "Miami", "7852FL8588", "USA"));
 			}
