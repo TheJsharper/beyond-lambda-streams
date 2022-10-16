@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.BinaryOperator;
+import java.util.function.DoubleBinaryOperator;
+import java.util.function.DoubleUnaryOperator;
+import java.util.function.IntBinaryOperator;
+import java.util.function.IntUnaryOperator;
+import java.util.function.LongBinaryOperator;
+import java.util.function.LongUnaryOperator;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
@@ -12,6 +18,18 @@ import lambda.comparator.utils.Utils;
 
 public class UsingOperators {
 	private static Comparator<Integer> comparator = (a, b) -> a.compareTo(b);
+
+	private static DoubleUnaryOperator doubleUnaryOperator = (double value) -> value * 18.8;
+
+	private static IntUnaryOperator intUnaryOperator = (int value) -> value + Integer.MIN_VALUE;
+
+	private static LongUnaryOperator longUnaryOperator = (long value) -> value + Long.MIN_VALUE;
+
+	private static DoubleBinaryOperator doubleBinaryOperator = (double left, double right) -> left + right;
+
+	private static IntBinaryOperator intBinaryOperator = (int left, int right) -> left * right;
+
+	private static LongBinaryOperator longBinaryOperator = (long left, long right) -> left + right + Long.MIN_VALUE;
 
 	public static void main(String[] args) {
 		UnaryOperator<String> unaryOperator = (String input) -> input.concat(" more word....");
@@ -32,7 +50,21 @@ public class UsingOperators {
 		BinaryOperator<Integer> minBy = BinaryOperator.minBy(comparator);
 		System.out.println("Result is: " + minBy.apply(5, 6));
 
+		System.out.println("DoubleUnaryOperator (long value) = " + doubleUnaryOperator.applyAsDouble(10));
+
+		System.out.println("IntUnaryOperator (int value) = " + intUnaryOperator.applyAsInt(10));
+
+		System.out.println("LongUnaryOperator (int value) = " + longUnaryOperator.applyAsLong(10));
+
+		System.out.println(
+				"DoubleBinaryOperator (double left, double right) = " + doubleBinaryOperator.applyAsDouble(10, 10));
+
+		System.out.println("IntBinaryOperator (int left, int right) = " + intBinaryOperator.applyAsInt(10, 10));
+
+		System.out.println("LongBinaryOperator (long left, long right) = " + longBinaryOperator.applyAsLong(10, 10));
+
 		System.out.println("--------------------------Concatting two List --------------------");
+
 		contactStudents().apply(students, Utils.getMergedSimpleStudentAdresses()).forEach(System.out::println);
 
 	}
