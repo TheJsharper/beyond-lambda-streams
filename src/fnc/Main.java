@@ -1,4 +1,4 @@
-package function;
+package fnc;
 
 import lambda.comparator.utils.Utils;
 
