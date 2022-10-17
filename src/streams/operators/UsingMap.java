@@ -22,19 +22,19 @@ public class UsingMap {
 	public static void main(String[] args) {
 		var students = getSimpleStudents();
 		print(getFirstNameUpperCase(students), "getFirstNameUpperCase");
-		
+
 		print(getSetOfLastNameUpperCase(students), "getSetOfLastNameUpperCase");
-		
+
 		print(getFirstNameLengthMap(students), "getFirstNameLengthMap");
-		
+
 		printAddresses(getAddressesUsingMapMulti(getMergedSimpleStudentAdresses().stream()), "AddressesUsingMapMulti");
-		
+
 		System.out.printf("AVG AGES Value: %s  %s\n", getAgeAverageUsingMapMultiToDouble(students.stream()).toString(),
 				"getAgeAverageUsingMapMultiToDouble".toUpperCase());
-		
+
 		System.out.printf("MAX AGE Value: %s  %s\n", getAgeMaxUsingMapMultiToLong(students.stream()).toString(),
 				"getAgeMaxUsingMapMultiToLong".toUpperCase());
-		
+
 		System.out.printf("MIN AGE Value: %s  %s\n", getAgeMinUsingMapMultiToInt(students.stream()).toString(),
 				"getAgeMinUsingMapMultiToInt".toUpperCase());
 
@@ -64,12 +64,14 @@ public class UsingMap {
 		}).average();
 		return value.isPresent() ? value.getAsDouble() : 0.0;
 	}
+
 	private static Long getAgeMaxUsingMapMultiToLong(Stream<Student> students) {
 		var value = students.mapMultiToLong((Student s, LongConsumer longConsumer) -> {
 			longConsumer.accept(s.getAge());
 		}).max();
 		return value.isPresent() ? value.getAsLong() : 0;
 	}
+
 	private static Integer getAgeMinUsingMapMultiToInt(Stream<Student> students) {
 		var value = students.mapMultiToInt((Student s, IntConsumer longConsumer) -> {
 			longConsumer.accept(s.getAge());
