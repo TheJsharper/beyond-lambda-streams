@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongConsumer;
 import java.util.stream.Collectors;
@@ -59,23 +60,20 @@ public class UsingMap {
 	}
 
 	private static Double getAgeAverageUsingMapMultiToDouble(Stream<Student> students) {
-		var value = students.mapMultiToDouble((s, DoubleConsumer) -> {
-			DoubleConsumer.accept(s.getAge());
-		}).average();
+		var value = students.mapMultiToDouble((Student s, DoubleConsumer consumer) -> consumer.accept(s.getAge()))
+				.average();
 		return value.isPresent() ? value.getAsDouble() : 0.0;
 	}
 
 	private static Long getAgeMaxUsingMapMultiToLong(Stream<Student> students) {
-		var value = students.mapMultiToLong((Student s, LongConsumer longConsumer) -> {
-			longConsumer.accept(s.getAge());
-		}).max();
+		var value = students.mapMultiToLong((Student s, LongConsumer longConsumer) -> longConsumer.accept(s.getAge()))
+				.max();
 		return value.isPresent() ? value.getAsLong() : 0;
 	}
 
 	private static Integer getAgeMinUsingMapMultiToInt(Stream<Student> students) {
-		var value = students.mapMultiToInt((Student s, IntConsumer longConsumer) -> {
-			longConsumer.accept(s.getAge());
-		}).min();
+		var value = students.mapMultiToInt((Student s, IntConsumer longConsumer) -> longConsumer.accept(s.getAge()))
+				.min();
 		return value.isPresent() ? value.getAsInt() : 0;
 	}
 
