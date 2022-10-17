@@ -1,6 +1,6 @@
 package streams.operators;
 
-import static lambda.comparator.utils.Utils.getSimpleStudents;
+import static lambda.comparator.utils.Utils.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,7 +9,9 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import lambda.comparator.lambda.model.Address;
 import lambda.comparator.lambda.model.Student;
 
 public class UsingMap {
@@ -19,6 +21,7 @@ public class UsingMap {
 		print(getFirstNameUpperCase(students), "getFirstNameUpperCase");
 		print(getSetOfLastNameUpperCase(students), "getSetOfLastNameUpperCase");
 		print(getFirstNameLengthMap(students), "getFirstNameLengthMap");
+		printAddresses(getAddressesUsingMapMulti(getMergedSimpleStudentAdresses().stream()), "AddressesUsingMapMulti");
 
 	}
 
@@ -34,9 +37,21 @@ public class UsingMap {
 		return students.stream().map(Student::getFirstName).collect(Collectors.toMap(String::toString, String::length));
 	}
 
+	private static List<Address> getAddressesUsingMapMulti(Stream<Student> students) {
+
+		return students.mapMulti((Student s, Consumer<List<Address>> consumer) -> consumer.accept(s.getAddresses()))
+				.flatMap(List::stream).collect(Collectors.toList());
+	}
+
 	private static void print(Collection<String> names, String Label) {
 		System.out.println("-------------------------" + Label.toUpperCase() + "----------------------");
 		Consumer<String> consumer = (name) -> System.out.println(name);
+		names.forEach(consumer);
+	}
+
+	private static void printAddresses(Collection<Address> names, String Label) {
+		System.out.println("-------------------------" + Label.toUpperCase() + "----------------------");
+		Consumer<Address> consumer = (name) -> System.out.println(name);
 		names.forEach(consumer);
 	}
 
