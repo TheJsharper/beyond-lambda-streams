@@ -106,4 +106,12 @@ public class Student implements Comparable<Student> {
 		this.addresses = addresses;
 	}
 
+	public void printAddresses() {
+		System.out.println("List of Addresses :" + this.addresses);
+	}
+
+	public void printFullName() {
+		System.out.printf("Name %s %s %s\n", this.getFirstName(), " ", this.getLastName());
+	};
+
 }

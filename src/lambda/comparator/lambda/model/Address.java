@@ -1,6 +1,11 @@
 package lambda.comparator.lambda.model;
 
+import java.util.function.Consumer;
+
 public class Address {
+
+	public static Consumer<Address> TO_STRING2 = Address::getCountry;
+
 	private int id;
 	private String street;
 
