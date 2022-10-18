@@ -3,7 +3,11 @@ package streams.operators;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import lambda.comparator.lambda.model.Address;
@@ -14,9 +18,19 @@ public class UsingFlatMap {
 
 	public static void main(String[] args) {
 		var students = Utils.getMergedSimpleStudentAdresses();
+		Supplier<Stream<Student>> supplier = () -> {
+			return students.stream();
+		};
 		print(getSimpleFlatMap());
-		print(getCountries(students.stream()));
-		printAddresses(getCountriesByName(students.stream(), "MX"));
+		print(getCountries(supplier.get().findFirst().stream()));
+		printAddresses(getCountriesByName(supplier.get().findFirst().stream(), "MX"));
+		
+		System.out.printf("%g  %s\n", getMaxAddressOfStudent(supplier.get().findFirst().stream()),
+				"getMaxAddressOfStudent".toUpperCase());
+		System.out.printf("%d  %s\n", getMinAddressOfStudent(supplier.get().findFirst().stream()),
+				"getMinAddressOfStudent".toUpperCase());
+		System.out.printf("%d  %s\n", getAvgAddressOfStudent(supplier.get().findFirst().stream()),
+				"getAvgAddressOfStudent".toUpperCase());
 	}
 
 	private static List<String> getCountries(Stream<Student> students) {
@@ -34,6 +48,33 @@ public class UsingFlatMap {
 		}).filter((s) -> s.getAddresses().size() > 0).flatMap((s) -> {
 			return s.getAddresses().stream();
 		}).collect(Collectors.toList());
+
+	}
+
+	private static double getMaxAddressOfStudent(Stream<Student> students) {
+
+		var maxValue = students.map((s) -> s.getAddresses()).distinct()
+				.flatMapToDouble((List<Address> s) -> DoubleStream.of(s.size())).max();
+
+		return maxValue.isPresent() ? maxValue.getAsDouble() : 0.0;
+
+	}
+
+	private static int getMinAddressOfStudent(Stream<Student> students) {
+
+		var minValue = students.map((s) -> s.getAddresses()).distinct()
+				.flatMapToInt((List<Address> s) -> IntStream.of(s.size())).max();
+
+		return minValue.isPresent() ? minValue.getAsInt() : 0;
+
+	}
+
+	private static Long getAvgAddressOfStudent(Stream<Student> students) {
+
+		var avgValue = students.map((s) -> s.getAddresses()).distinct()
+				.flatMapToLong((List<Address> s) -> LongStream.of(s.size())).max();
+
+		return avgValue.isPresent() ? avgValue.getAsLong() : 0L;
 
 	}
 

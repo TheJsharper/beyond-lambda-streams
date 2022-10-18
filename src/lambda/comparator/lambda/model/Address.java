@@ -1,5 +1,6 @@
 package lambda.comparator.lambda.model;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class Address {
@@ -64,6 +65,26 @@ public class Address {
 
 	public void setCountry(String country) {
 		this.country = country;
+	}
+
+	
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(city, country, id, street, zip);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Address other = (Address) obj;
+		return Objects.equals(city, other.city) && Objects.equals(country, other.country) && id == other.id
+				&& Objects.equals(street, other.street) && Objects.equals(zip, other.zip);
 	}
 
 	@Override
