@@ -16,7 +16,7 @@ public class UsingSimpleSkipLimit {
 
 		printInteger(getSimpleSkippedList(values, 3), "getSimpleSkippedList");
 
-		printInteger(getSimplePagingList(values, 3, 9), "getSimplePagingList");
+		printInteger(getSimplePagingList(values, 3, 8), "getSimplePagingList");
 
 		sumFromStartTo(values, 3).ifPresentOrElse(
 				(Integer sumValue) -> System.out.println(" Total sum from index 3: " + sumValue),
