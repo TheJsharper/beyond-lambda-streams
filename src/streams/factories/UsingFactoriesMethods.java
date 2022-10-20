@@ -15,6 +15,7 @@ public class UsingFactoriesMethods {
 
 	public static void main(String[] args) {
 		var students = createStudentListWithAddresses();
+		
 		Stream<String> simpleStream = getSimpleStreamByOf("John", "Stephan", "Joe", "Jerry", "Tom");
 
 		simpleStream.forEach(System.out::println);
