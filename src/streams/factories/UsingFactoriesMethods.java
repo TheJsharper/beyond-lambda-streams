@@ -28,8 +28,12 @@ public class UsingFactoriesMethods {
 		Supplier<Stream<Student>> supplier = () -> students.stream();
 
 		var generatedList = generateStreamStudent(supplier).findFirst().get().collect(Collectors.toList());
-		
+
 		print(generatedList, "generatedList");
+
+		var generateByBuilder = getStudentStreamFromBuilder(students).collect(Collectors.toList());
+
+		print(generateByBuilder, "getStudentStreamFromBuilder");
 
 	}
 
@@ -63,6 +67,12 @@ public class UsingFactoriesMethods {
 
 	private static Stream<Stream<Student>> generateStreamStudent(Supplier<Stream<Student>> s) {
 		return Stream.generate(s);
+	}
+
+	private static Stream<Student> getStudentStreamFromBuilder(List<Student> students) {
+		Stream.Builder<Student> builder = Stream.builder();
+		students.forEach((Student s) -> builder.accept(s));
+		return builder.build();
 	}
 
 	private static String[] getAllLastName(List<Student> students) {
