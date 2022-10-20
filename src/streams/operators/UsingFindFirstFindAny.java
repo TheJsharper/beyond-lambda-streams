@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import lambda.comparator.lambda.model.Student;
 
-public class UsingFindAnyFindFirst {
+public class UsingFindFirstFindAny {
 
 	public static void main(String[] args) {
 		var students = createStudentListWithAddresses();
@@ -25,8 +25,6 @@ public class UsingFindAnyFindFirst {
 		printStudentOptional(getAnyStudentLastNameStartsWitch(students, "ItDoestNotExist"));
 
 	}
-
-	
 
 	private static Optional<Student> getSimpleFirstStudent(List<Student> students) {
 		return students.stream().findFirst();

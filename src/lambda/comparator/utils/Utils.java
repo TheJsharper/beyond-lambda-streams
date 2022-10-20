@@ -5,9 +5,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -75,6 +77,7 @@ public class Utils {
 		}).collect(Collectors.toList());
 
 	}
+
 	@SuppressWarnings("serial")
 	public static List<Student> getSimpleStudents() {
 
@@ -118,5 +121,36 @@ public class Utils {
 		return result;
 	}
 
+	public static void print(Collection<String> names, String Label) {
+		System.out.println("-------------------------" + Label.toUpperCase() + "----------------------");
+		Consumer<String> consumer = (name) -> System.out.println(name);
+		names.forEach(consumer);
+	}
+
+	public static void printAddresses(Collection<Address> names, String Label) {
+		System.out.println("-------------------------" + Label.toUpperCase() + "----------------------");
+		Consumer<Address> consumer = (name) -> System.out.println(name);
+		names.forEach(consumer);
+	}
+
+	public static void printListOfStudents(List<String> students, String label) {
+		System.out.printf("----------------------- %s %s\n", label, "---------------------------------");
+		students.forEach(Utils::printStudent);
+
+	}
+
+	public static void print(List<Student> students, String label) {
+		System.out.printf("----------------------- %s %s\n", label, "---------------------------------");
+		students.forEach(Utils::printStudent);
+	}
+
+	public static void printStudent(Student student) {
+		System.out.println(student);
+	}
+
+	public static void printStudent(String student) {
+		System.out.println(student);
+
+	}
 
 }
