@@ -15,7 +15,7 @@ public class UsingFactoriesMethods {
 
 	public static void main(String[] args) {
 		var students = createStudentListWithAddresses();
-		
+
 		Stream<String> simpleStream = getSimpleStreamByOf("John", "Stephan", "Joe", "Jerry", "Tom");
 
 		simpleStream.forEach(System.out::println);
@@ -32,9 +32,13 @@ public class UsingFactoriesMethods {
 
 		print(generatedList, "generatedList");
 
-		var generateByBuilder = getStudentStreamFromBuilder(students).collect(Collectors.toList());
+		var generateByBuilder = getStudentStreamFromBuilder(students).limit(10).collect(Collectors.toList());
 
 		print(generateByBuilder, "getStudentStreamFromBuilder");
+
+		var generateByAddinBuilder = getStudentStreamByBuilder(students).limit(10).collect(Collectors.toList());
+
+		print(generateByAddinBuilder, "getStudentStreamByBuilder");
 
 	}
 
@@ -73,6 +77,12 @@ public class UsingFactoriesMethods {
 	private static Stream<Student> getStudentStreamFromBuilder(List<Student> students) {
 		Stream.Builder<Student> builder = Stream.builder();
 		students.forEach((Student s) -> builder.accept(s));
+		return builder.build();
+	}
+
+	private static Stream<Student> getStudentStreamByBuilder(List<Student> students) {
+		Stream.Builder<Student> builder = Stream.builder();
+		students.forEach((Student s) -> builder.add(s));
 		return builder.build();
 	}
 
