@@ -121,6 +121,13 @@ public class Utils {
 		return result;
 	}
 
+	public static Stream<Student> buildStreamFromListStudent(List<Student> students) {
+		Stream.Builder<Student> builder = Stream.builder();
+		students.forEach(builder::add);
+		return builder.build();
+
+	}
+
 	public static void print(Collection<String> names, String Label) {
 		System.out.println("-------------------------" + Label.toUpperCase() + "----------------------");
 		Consumer<String> consumer = (name) -> System.out.println(name);
