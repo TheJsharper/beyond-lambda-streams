@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -128,6 +129,10 @@ public class Utils {
 
 	}
 
+	public static Supplier<Stream<Student>> getStudentSupplier(Stream<Student> student) {
+		return () -> student;
+	}
+
 	public static void print(Collection<String> names, String Label) {
 		System.out.println("-------------------------" + Label.toUpperCase() + "----------------------");
 		Consumer<String> consumer = (name) -> System.out.println(name);
@@ -158,6 +163,11 @@ public class Utils {
 	public static void printStudent(String student) {
 		System.out.println(student);
 
+	}
+
+	public static void printOptional(Optional<Student> s, String labelIfPresent, String labelIfNotPresent) {
+		s.ifPresentOrElse((Student student) -> System.out.printf("%s  %s\n", labelIfPresent, student),
+				() -> System.err.print(labelIfNotPresent));
 	}
 
 }
