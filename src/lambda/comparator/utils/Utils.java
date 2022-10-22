@@ -139,6 +139,24 @@ public class Utils {
 		names.forEach(consumer);
 	}
 
+	public static void print(Map<String, List<Student>> studentMap, String label) {
+		System.out.println("-------------------------" + label.toUpperCase() + "----------------------");
+		studentMap.forEach((String key, List<Student> students) -> {
+			System.out.println("==> Key: " + key);
+			print(students, "-------------------------List of students ------------------------");
+		});
+
+	}
+
+	public static void printMapKeyInteger(Map<Integer, List<Student>> studentMap, String label) {
+		System.out.println("-------------------------" + label.toUpperCase() + "----------------------");
+		studentMap.forEach((Integer key, List<Student> students) -> {
+			System.out.println("==> Key: " + key);
+			print(students, "-------------------------List of students ------------------------");
+		});
+
+	}
+
 	public static void printAddresses(Collection<Address> names, String Label) {
 		System.out.println("-------------------------" + Label.toUpperCase() + "----------------------");
 		Consumer<Address> consumer = (name) -> System.out.println(name);
