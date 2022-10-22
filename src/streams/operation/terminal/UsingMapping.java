@@ -38,6 +38,7 @@ public class UsingMapping {
 	}
 
 	private static Map<String, List<Address>> getMapStudentAddresses(Stream<Student> students) {
+
 		return students.collect(Collectors.mapping((Student s) -> s, Collectors
 				.toMap((Student s) -> s.getFirstName() + " " + s.getLastName() + " ", Student::getAddresses)));
 
