@@ -57,17 +57,15 @@ public class UsingGroupingByExtend {
 	}
 
 	private static Comparator<Map.Entry<String, List<Address>>> getComparatorMap() {
-		return new Comparator<Map.Entry<String, List<Address>>>() {
-			@Override
-			public int compare(Entry<String, List<Address>> list1, Entry<String, List<Address>> list2) {
-				var sorted1 = list1.getValue().stream().sorted(Comparator.comparing(Address::getCity))
-						.collect(Collectors.toList());
-				var sorted2 = list2.getValue().stream().sorted(Comparator.comparing(Address::getCity))
-						.collect(Collectors.toList());
-				list1.setValue(sorted1);
-				list2.setValue(sorted2);
-				return list1.getValue().size() - list2.getValue().size();
-			}
+
+		return (Entry<String, List<Address>> list1, Entry<String, List<Address>> list2) -> {
+			var sorted1 = list1.getValue().stream().sorted(Comparator.comparing(Address::getCity))
+					.collect(Collectors.toList());
+			var sorted2 = list2.getValue().stream().sorted(Comparator.comparing(Address::getCity))
+					.collect(Collectors.toList());
+			list1.setValue(sorted1);
+			list2.setValue(sorted2);
+			return list1.getValue().size() - list2.getValue().size();
 		};
 	}
 
