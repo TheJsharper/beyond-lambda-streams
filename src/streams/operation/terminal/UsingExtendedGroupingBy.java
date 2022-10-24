@@ -19,7 +19,7 @@ import lambda.comparator.lambda.model.Address;
 import lambda.comparator.lambda.model.Student;
 import lambda.comparator.utils.Utils;
 
-public class UsingGroupingByExtend {
+public class UsingExtendedGroupingBy {
 	public static void main(String[] args) {
 		Supplier<Stream<Student>> s = () -> buildStreamFromListStudent(createStudentListWithAddresses());
 
