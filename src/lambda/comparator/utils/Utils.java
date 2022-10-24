@@ -129,7 +129,8 @@ public class Utils {
 		return builder.build();
 
 	}
-	public static Function<Student, String> keyMapperString() {
+
+	public static Function<Student, String> keyMapperByAgesGroupingString() {
 		return (Student s) -> {
 			if (s.getAge() <= 5) {
 				return "CHILDHOOD";
@@ -181,6 +182,15 @@ public class Utils {
 		studentMap.forEach((String key, List<Student> students) -> {
 			System.out.println("==> Key: " + key);
 			print(students, "-------------------------List of students ------------------------");
+		});
+
+	}
+
+	public static void printMapAddresses(Map<String, List<Address>> studentMap, String label) {
+		System.out.println("-------------------------" + label.toUpperCase() + "----------------------");
+		studentMap.forEach((String key, List<Address> students) -> {
+			System.out.println("==> Key: " + key);
+			printAddresses(students, "-------------------------List of Addresses ------------------------");
 		});
 
 	}
