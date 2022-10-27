@@ -9,16 +9,19 @@ import java.util.stream.Stream;
 
 import lambda.comparator.lambda.model.Student;
 
-public class Main {
+public class BasicsJoining {
 
 	public static void main(String[] args) {
+
 		Supplier<Stream<Student>> s = () -> buildStreamFromListStudent(createStudentListWithAddresses());
 
-		System.out.println("->" + joiningWithoutParameter(s.get()));
+		System.out.println("-> Result: " + joiningWithoutParameter(s.get()));
 
-		System.out.println("->" + joiningWithParameterDelimiter(s.get()));
+		System.out.println("-> Result: " + joiningWithParameterDelimiter(s.get()));
 
-		System.out.println("->" + joiningWithParameterDelPreAndSuffix(s.get()));
+		System.out.println("-> Result: " + joiningWithParameterDelPreAndSuffix(s.get()));
+
+	
 
 	}
 
@@ -50,5 +53,7 @@ public class Main {
 				.collect(Collectors.joining(delimiter, prefix, suffix));
 
 	}
+
+	
 
 }
