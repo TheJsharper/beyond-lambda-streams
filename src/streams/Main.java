@@ -15,8 +15,11 @@ public class Main {
 
 	public static void main(String[] args) {
 		var students = getMergedSimpleStudentAdresses();
+
 		printInitialStreamMap(students);
+
 		printInitialFlatMap(students);
+
 		printInitialStreamPeek(students);
 
 	}
@@ -43,7 +46,9 @@ public class Main {
 
 	private static void printInitialStreamPeek(List<Student> students) {
 		Consumer<Student> consumerPeekStudent = (Student s) -> System.out.println(s);
+
 		Consumer<String> consumerPeekString = (String s) -> System.out.println(s);
+
 		students.stream().peek(consumerPeekStudent).map(Student::getLastName).peek(consumerPeekString).distinct()
 				.collect(Collectors.toList()).forEach(consumerPeekString);
 	}
