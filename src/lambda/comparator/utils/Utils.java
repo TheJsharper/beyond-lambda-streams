@@ -167,6 +167,11 @@ public class Utils {
 		};
 	}
 
+	public static double getDistanceDiff(long a, long b) {
+		double avg = (a + b) / 2;
+		return 100 * (Math.abs(a - b) / avg);
+	}
+
 	public static Supplier<Stream<Student>> getStudentSupplier(Stream<Student> student) {
 		return () -> student;
 	}
