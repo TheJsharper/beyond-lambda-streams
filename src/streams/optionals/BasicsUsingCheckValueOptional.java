@@ -3,7 +3,7 @@ package streams.optionals;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class BasicsUsingCheckIf {
+public class BasicsUsingCheckValueOptional {
 
 	public static void main(String[] args) {
 
