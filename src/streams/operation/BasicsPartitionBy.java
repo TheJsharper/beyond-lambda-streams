@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -40,10 +41,15 @@ public class BasicsPartitionBy {
 
 		Predicate<Student> condition = (Student s) -> s.getAge() >= 18;
 
+		Function<Entry<Boolean, Set<Student>>, String> keyMapper = (
+				Entry<Boolean, Set<Student>> e) -> e.getKey() ? "Adult" : "Minor";
+
+		Function<? super Entry<Boolean, Set<Student>>, ? extends Set<Student>> valueMapper = (
+				Entry<Boolean, Set<Student>> e) -> e.getValue().stream().limit(5).collect(Collectors.toSet());
+
+	
 		return students.collect(Collectors.partitioningBy(condition, Collectors.toSet())).entrySet().stream().limit(10)
-				.collect(Collectors.toMap((Entry<Boolean, Set<Student>> e) -> e.getKey() ? "Adult" : "Minor",
-						(Entry<Boolean, Set<Student>> e) -> e.getValue().stream().limit(5)
-								.collect(Collectors.toSet())));
+				.collect(Collectors.toMap(keyMapper, valueMapper));
 
 	}
 
