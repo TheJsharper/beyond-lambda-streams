@@ -42,13 +42,13 @@ public class DefaultComplex {
 
 interface D {
 	default void complexMethodD() {
-		System.out.println("complexMethodD----> from interface" + A.class);
+		System.out.println("complexMethodD----> from interface" + D.class);
 	}
 }
 
 interface E extends D {
 	default void complexMethodE() {
-		System.out.println("complexMethodE----> from interface" + B.class);
+		System.out.println("complexMethodE----> from interface" + E.class);
 	}
 
 	@Override
@@ -61,12 +61,12 @@ interface E extends D {
 
 interface F extends D, E {
 	default void complexMethodF() {
-		System.out.println("complexMethodF----> from interface" + C.class);
+		System.out.println("complexMethodF----> from interface" + F.class);
 	}
 
 	@Override
 	default void complexMethodD() {
-		System.out.println(" @Override complexMethodD----> from interface" + A.class);
+		System.out.println(" @Override complexMethodD----> from interface" + F.class);
 	}
 }
 
