@@ -41,8 +41,9 @@ public class BasicsPartitionBy {
 		Predicate<Student> condition = (Student s) -> s.getAge() >= 18;
 
 		return students.collect(Collectors.partitioningBy(condition, Collectors.toSet())).entrySet().stream().limit(10)
-				.collect(Collectors.toMap((e) -> e.getKey() ? "Adult" : "Minor",
-						(list) -> list.getValue().stream().limit(5).collect(Collectors.toSet())));
+				.collect(Collectors.toMap((Entry<Boolean, Set<Student>> e) -> e.getKey() ? "Adult" : "Minor",
+						(Entry<Boolean, Set<Student>> e) -> e.getValue().stream().limit(5)
+								.collect(Collectors.toSet())));
 
 	}
 
