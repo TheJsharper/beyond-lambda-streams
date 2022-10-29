@@ -35,7 +35,6 @@ public class DefaultComplex {
 		abcImpl.complexMethodE();
 
 		abcImpl.complexMethodF();
-
 	}
 
 }
