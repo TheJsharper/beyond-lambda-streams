@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class Main {
+public class UsingLocalDate {
 
 	public static void main(String[] args) {
 
@@ -32,7 +32,9 @@ public class Main {
 		LocalDateTime localDateTime = LocalDateTime.now();
 
 		System.out.printf("Just local date ---> %s\n", localDate);
+
 		System.out.printf("Just local time ---> %s\n", localTime);
+
 		System.out.printf("Local date and time ---> %s\n", localDateTime);
 	}
 
