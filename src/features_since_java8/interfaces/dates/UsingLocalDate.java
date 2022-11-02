@@ -29,6 +29,8 @@ public class UsingLocalDate {
 		printModifyingValueImmutableLocalDate();
 
 		printComparableDate();
+
+		printConvertLocalDateAndLocalTome();
 	}
 
 	private static void printAllnewClazzes() {
@@ -166,13 +168,32 @@ public class UsingLocalDate {
 		System.out.printf("Is this year 2000/01/31 LeafYear?: %s\n", LocalDate.of(2000, 01, 31).isLeapYear());
 
 		System.out.printf("Is %s  After %s ?: %s\n ", now, afternow, now.isAfter(afternow));
-		
+
 		System.out.printf("Is %s  After %s ?: %s\n ", afternow, now, afternow.isAfter(now));
-		
+
 		System.out.printf("Is %s  Before %s ?: %s\n ", now, beforeNow, now.isAfter(beforeNow));
-		
+
 		System.out.printf("Is %s  Before %s ?: %s\n ", beforeNow, now, beforeNow.isAfter(now));
 
+	}
+
+	private static void printConvertLocalDateAndLocalTome() {
+
+		LocalDate now = LocalDate.now();
+
+		System.out.printf("LocalDate: %s after set new customer time: %s\n ", now, now.atTime(5, 30));
+
+		System.out.printf("LocalDate: %s after set new customer time and cast LocalDate: %s\n ", now,
+				now.atTime(5, 30).toLocalDate());
+
+		LocalTime timeNow = LocalTime.now();
+
+		System.out.printf("LocalTime: %s after set new customer time: %s\n ", timeNow, timeNow.atDate(now));
+
+		System.out.printf("LocalTime: %s after set new customer time and cast to LocalDate: %s\n ", timeNow,
+				timeNow.atDate(now).toLocalDate());
+
+		System.out.println("atStartOfDay : " + now.atStartOfDay());
 	}
 
 }
