@@ -1,4 +1,4 @@
-package features_since_java8.interfaces.dates;
+package features_since_java8.date;
 
 import java.time.Duration;
 import java.time.Instant;

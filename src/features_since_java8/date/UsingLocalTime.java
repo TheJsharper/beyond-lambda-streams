@@ -1,4 +1,4 @@
-package features_since_java8.interfaces.dates;
+package features_since_java8.date;
 
 import java.time.LocalTime;
 import java.time.temporal.ChronoField;
